@@ -1,3 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="common_search">Pesquisa</string>
+    <string name="common_logs">Registros</string>
+    <string name="common_settings">Configurações</string>
+    <string name="common_allow">Permitir</string>
+    <string name="common_cancel">Cancelar</string>
+    <string name="common_enable">Habilitar</string>
+    <string name="common_disable">Desabilitar</string>
+    <string name="common_done">Feito</string>
+    <string name="common_delete">Deletar</string>
+    <string name="common_clear">Limpar</string>
+    <string name="common_retry">Tentar novamente</string>
+    <string name="details_title">Detalhes</string>
+    <string name="details_installation_time">Tempo de instalação</string>
+    <string name="network_wifi">Wi-Fi</string>
+    <string name="network_cellular">Celular</string>
+    <string name="network_bypass_vpn">Contornar VPN</string>
+    <string name="vpn_service_running">Fazer cumprir as regras</string>
+    <string name="vpn_service_channel_name">Notificações do serviço VPN</string>
+    <string name="vpn_service_channel_description">Notificações sobre o status e atualizações do serviço VPN</string>
+    <string name="vpn_permission_title">Escolha o método</string>
+    <string name="vpn_permission_description">Selecione o método de proteção de sua preferência para filtragem de rede</string>
+    <string name="settings_colors">Cores e estilos</string>
+    <string name="settings_behavior">Comportamento</string>
 </resources>
