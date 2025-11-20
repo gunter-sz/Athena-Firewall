@@ -67,7 +67,7 @@
     <string name="blocklist_validation_failed">Validação falhou</string>
     <string name="download_success">Sucesso</string>
     <string name="download_failed_title">Download Falhou</string>
-    <string name="download_error_message">Algo deu errado durante o download das regras.</string>
+    <string name="download_error_message">Algo deu errado durante o download das regras</string>
     <string name="error_vpn_not_running">A VPN não está funcionando</string>
     <string name="error_dns_toggle_failed">Falha ao ativar/desativar o bloqueio de DNS</string>
     <string name="premium_code">Código Premium</string>
@@ -99,4 +99,11 @@
     <string name="behavior_permanent_notification_desc">Tornar a notificação silenciosa e sem cores</string>
     <string name="debug_title">Depurar</string>
     <string name="method_use_vpn">Usar VPN</string>
+    <string name="tile_status_tap_enable">Clique para ativar</string>
+    <string name="tile_error">Erro</string>
+    <string name="tile_status_active">Ativado</string>
+    <string name="details_version">Versão</string>
+    <string name="details_permissions">Permissões</string>
+    <string name="details_installed">Instalado</string>
+    <string name="details_last_updated">Última Atualização</string>
 </resources>
