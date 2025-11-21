@@ -106,5 +106,10 @@
     <string name="details_permissions">Permissões</string>
     <string name="details_installed">Instalado</string>
     <string name="details_last_updated">Última Atualização</string>
-    <string name="behavior_start_on_boot_desc">Iniciar firewall quando o dispositivo ligar</string>
+    <string name="behavior_start_on_boot_desc">Iniciar o firewall quando o dispositivo ligar</string>
+    <string name="home_firewall_terminated">Firewall Encerrado</string>
+    <string name="home_firewall_disable">Desativar o Firewall</string>
+    <string name="home_applying_rules">Aplicando regras do firewall…</string>
+    <string name="home_firewall_permission_desc">Você tem certeza que deseja desativar o firewall?</string>
+    <string name="home_warning_title">Aviso Importante</string>
 </resources>
