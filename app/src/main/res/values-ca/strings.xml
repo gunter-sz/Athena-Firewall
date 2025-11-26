@@ -1,3 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="common_search">Cerca</string>
+    <string name="common_logs">Registres</string>
+    <string name="common_settings">Configuració</string>
+    <string name="common_allow">Permet</string>
+    <string name="common_cancel">Cancel·la</string>
+    <string name="common_enable">Habilita</string>
+    <string name="common_disable">Deshabilita</string>
+    <string name="common_done">Fet</string>
+    <string name="common_delete">Esborra</string>
+    <string name="common_clear">Neteja</string>
+    <string name="common_retry">Reintenta</string>
+    <string name="details_title">Detalls</string>
+    <string name="details_installation_time">Temps d\'instalació</string>
+    <string name="network_wifi">WiFi</string>
+    <string name="network_cellular">Dades mòbils</string>
+    <string name="network_bypass_vpn">Ignora l\'VPN</string>
 </resources>
