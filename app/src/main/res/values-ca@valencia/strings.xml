@@ -35,10 +35,10 @@
     <string name="about_latest_release">Última versió</string>
     <string name="about_source_code">Codi font</string>
     <string name="about_email">Correu electrònic</string>
-    <string name="about_discord">Canal de Discord</string>
+    <string name="about_discord">Discord</string>
     <string name="about_rate_app">Puntua l\'aplicació</string>
     <string name="about_your_name">xusisme</string>
-    <string name="root_permission_description">Concedeix accés Root per a gestionar el tràfic mitjançant \'iptables\'. Açò permet a l\'Athena controlar quines aplicacions poden accedir a internet</string>
+    <string name="root_permission_description">Concedeix accés Root per a gestionar el tràfic mitjançant iptables. Açò permet a l\'Athena controlar quines aplicacions poden accedir a internet</string>
     <string name="language_description">Canvia l\'idioma</string>
     <string name="logs_search_packets">Filtre (app, ip, dominis)</string>
     <string name="notification_install_message">Ha sigut instal·lat</string>
@@ -84,7 +84,7 @@
     <string name="behavior_use_root_desc">Gasta el mètode Root per al tallafocs</string>
     <string name="behavior_use_shizuku">Gasta Shizuku</string>
     <string name="behavior_use_shizuku_desc">Gasta Shizuku per al tallafocs</string>
-    <string name="behavior_root_disabled_message">Per favor, deshabilita el tallafocs avanç de modificar la configuració de Root.</string>
+    <string name="behavior_root_disabled_message">Per favor, deshabilita el tallafocs abans de modificar la configuració de Root.</string>
     <string name="behavior_logs_desc">Habilita l\'enregistrament de connexions</string>
     <string name="behavior_show_system_apps">Mostra aplicacions del sistema</string>
     <string name="behavior_show_system_apps_desc">Mostra aplicacions del sistema a la llista d\'aplicacions</string>
@@ -179,7 +179,7 @@
     <string name="colors_amoled">Colors AMOLED</string>
     <string name="colors_amoled_desc">Fons negre pur</string>
     <string name="colors_show_disable_dialog">Mostra el diàleg per a deshabilitar</string>
-    <string name="colors_show_disable_dialog_desc">Confirma avanç de deshabilitar el tallafocs</string>
+    <string name="colors_show_disable_dialog_desc">Confirma abans de deshabilitar el tallafocs</string>
     <string name="colors_language">Llengua i idioma</string>
     <string name="colors_system_language">Llengua del sistema</string>
     <string name="dns_set_custom_desc">Configura servidors DNS personalitzats</string>
@@ -204,7 +204,7 @@
     <string name="dns_auto_update_description_template">Actualitzar llistes de bloqueig cada %1$s</string>
     <string name="dns_domain_management_title">Gestió de dominis</string>
     <string name="dns_domain_management_desc">Gestiona regles de domini personalitzades</string>
-    <string name="dns_domain_management_disabled_message">Per favor, deshabilita el tallafocs avanç d\'accedir al gestor de dominis.</string>
+    <string name="dns_domain_management_disabled_message">Per favor, deshabilita el tallafocs abans d\'accedir al gestor de dominis.</string>
     <string name="dns_allowlist_title">Llista permesa</string>
     <string name="dns_blocklist_title">Llista de bloqueig</string>
     <string name="dns_add_domain">Afig domini</string>
@@ -298,4 +298,5 @@
     <string name="notification_install_channel_desc">Notificacions per instal·lacions d\'aplicacions</string>
     <string name="notification_network_speed_channel">Monitor de velocitat de xarxa</string>
     <string name="notification_network_speed_channel_desc">Mostra la velocitat de xarxa en temps real</string>
+    <string name="network_kill_switch">Interruptor d\'apagat</string>
 </resources>
