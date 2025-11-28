@@ -80,10 +80,10 @@
     <string name="premium_unlock_only_feature">Desbloca només aquesta característica</string>
     <string name="behavior_notify_install">Notifica al instal·lar</string>
     <string name="behavior_notify_install_desc">Mostra una notificació quan s\'instal·len aplicacions</string>
-    <string name="behavior_use_root">Gasta Root</string>
-    <string name="behavior_use_root_desc">Gasta el mètode Root per al tallafocs</string>
-    <string name="behavior_use_shizuku">Gasta Shizuku</string>
-    <string name="behavior_use_shizuku_desc">Gasta Shizuku per al tallafocs</string>
+    <string name="behavior_use_root">Utilitza Root</string>
+    <string name="behavior_use_root_desc">Utilitza el mètode Root per al tallafocs</string>
+    <string name="behavior_use_shizuku">Utilitza Shizuku</string>
+    <string name="behavior_use_shizuku_desc">Utilitza Shizuku per al tallafocs</string>
     <string name="behavior_root_disabled_message">Per favor, deshabilita el tallafocs abans de modificar la configuració de Root.</string>
     <string name="behavior_logs_desc">Habilita l\'enregistrament de connexions</string>
     <string name="behavior_show_system_apps">Mostra aplicacions del sistema</string>
@@ -99,7 +99,7 @@
     <string name="behavior_permanent_notification">Notificació permanent</string>
     <string name="behavior_permanent_notification_desc">Fes que la notificació siga silenciosa i incolora</string>
     <string name="debug_title">Depurar</string>
-    <string name="method_use_vpn">Gasta VPN</string>
+    <string name="method_use_vpn">Utilitza VPN</string>
     <string name="permissions_grant_required">Per favor, concedeix el permís requerit al quadre de diàleg</string>
     <string name="permissions_grant_shizuku">Per favor, concedeix permís a Shizuku al quadre de diàleg</string>
     <string name="tile_error">Error</string>
@@ -112,7 +112,7 @@
     <string name="details_installed">Instal·lat</string>
     <string name="details_most_connections">Més connexions establides</string>
     <string name="home_firewall_terminated">Tallafocs terminat</string>
-    <string name="firewall_terminated_description">El servei de tallafocs ha acabat inesperadament. Neteja les dades i reinicia per a seguir gastant la protecció.</string>
+    <string name="firewall_terminated_description">El servei de tallafocs ha acabat inesperadament. Neteja les dades i reinicia per a seguir utilitzant la protecció.</string>
     <string name="home_firewall_disable">Deshabilita el tallafocs</string>
     <string name="home_firewall_permission_desc">Segur que vols deshabilitar el tallafocs?</string>
     <string name="home_applying_rules">Aplicant regles del tallafocs…</string>
@@ -127,8 +127,8 @@
     <string name="permissions_root">Permís de Root</string>
     <string name="permissions_deny_root">Denegar Root</string>
     <string name="permissions_setup">Aplicant permisos…</string>
-    <string name="permissions_use_root_method">Gasta Root</string>
-    <string name="permissions_use_shizuku_method">Gasta Shizuku (Limitat)</string>
+    <string name="permissions_use_root_method">Utilitza Root</string>
+    <string name="permissions_use_shizuku_method">Utilitza Shizuku (Limitat)</string>
     <string name="search_bar_placeholder">Cerca aplicacions…</string>
     <string name="packet_log_title">Registre de paquets</string>
     <string name="packet_firewall_status">Estat del tallafocs</string>
@@ -299,4 +299,5 @@
     <string name="notification_network_speed_channel">Monitor de velocitat de xarxa</string>
     <string name="notification_network_speed_channel_desc">Mostra la velocitat de xarxa en temps real</string>
     <string name="network_kill_switch">Interruptor d\'apagat</string>
+    <string name="rule_update_error">Error al actualitzar l\'amfitrió per a l\'element</string>
 </resources>
