@@ -17,8 +17,8 @@ android {
         applicationId = "com.kin.athena"
         minSdk = 24
         targetSdk = 36
-        versionCode = 104
-        versionName = "1.1"
+        versionCode = 205
+        versionName = "1.5"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -161,6 +161,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.m3color)
+
     // Hilt
     implementation(libs.hilt.android)
     implementation(libs.androidx.work.runtime.ktx)

@@ -68,6 +68,7 @@ data class Settings(
     val useDynamicIcons: Boolean = false,
     var dynamicTheme: Boolean = false,
     var amoledTheme: Boolean = false,
+    var customColor: Int = -7896468, // Default Material 3 accent color (0xFF5a5e6c - original primaryLight)
     var showDialog: Boolean = true,
 
     // Notifications

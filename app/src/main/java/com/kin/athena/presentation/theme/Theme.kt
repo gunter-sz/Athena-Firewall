@@ -33,25 +33,38 @@ import androidx.core.view.WindowCompat
 import com.kin.athena.presentation.screens.settings.viewModel.SettingsViewModel
 
 
-private fun getColorScheme(context: Context, isDarkTheme: Boolean, isDynamicTheme: Boolean, isAmoledTheme: Boolean): ColorScheme {
-    if (isDynamicTheme && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+private fun getColorScheme(context: Context, isDarkTheme: Boolean, isDynamicTheme: Boolean, isAmoledTheme: Boolean, keyColor: Color, useSystemDynamic: Boolean): ColorScheme {
+    if (isDynamicTheme) {
+        // Dynamic Colors ON
+        if (useSystemDynamic && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // Use system Material You colors (from wallpaper)
+            if (isDarkTheme) {
+                if (isAmoledTheme) {
+                    return getDarkDynamicColorScheme(context).copy(background = Color.Black, surface = Color.Black)
+                }
+                return getDarkDynamicColorScheme(context)
+            } else {
+                return getLightDynamicColorScheme(context)
+            }
+        } else {
+            // Use custom accent color generation
+            if (isDarkTheme) {
+                val darkScheme = generatePalette(keyColor, true)
+                return if (isAmoledTheme) darkScheme.copy(surfaceContainerLow = Color.Black, surface = Color.Black) else darkScheme
+            } else {
+                return generatePalette(keyColor, false)
+            }
+        }
+    } else {
+        // Dynamic Colors OFF → Use original static color schemes
         if (isDarkTheme) {
             if (isAmoledTheme) {
-                return getDarkDynamicColorScheme(context).copy(background = Color.Black, surface = Color.Black)
+                return darkScheme.copy(surfaceContainerLow = Color.Black, surface = Color.Black)
             }
-
-            return getDarkDynamicColorScheme(context)
+            return darkScheme
         } else {
-            return getLightDynamicColorScheme(context)
+            return lightScheme
         }
-    } else if (isDarkTheme) {
-        if (isAmoledTheme) {
-            return darkScheme.copy(surfaceContainerLow = Color.Black, surface = Color.Black)
-        }
-
-        return darkScheme
-    } else {
-        return lightScheme
     }
 }
 
@@ -79,8 +92,10 @@ fun EasyWallTheme(
         isAppearanceLightStatusBars = !settingsModel.settings.value.darkTheme
     }
 
+    val keyColor = Color(settingsModel.settings.value.customColor)
+    val useSystemDynamic = settingsModel.settings.value.customColor == -7896468 // Use system colors if user hasn't picked custom color
     MaterialTheme(
-        colorScheme = getColorScheme(context, settingsModel.settings.value.darkTheme, settingsModel.settings.value.dynamicTheme, settingsModel.settings.value.amoledTheme),
+        colorScheme = getColorScheme(context, settingsModel.settings.value.darkTheme, settingsModel.settings.value.dynamicTheme, settingsModel.settings.value.amoledTheme, keyColor, useSystemDynamic),
         typography = Typography(),
         content = content
     )

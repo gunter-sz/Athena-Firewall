@@ -89,3 +89,18 @@ val surfaceContainerLowDark = Color(0xFF151515)
 val surfaceContainerDark = Color(0xFF252525)
 val surfaceContainerHighDark = Color(0xFF151515)
 val surfaceContainerHighestDark = Color(0xFF303637)
+
+val PALETTE_COLORS = listOf<Color>(
+    Color(0xFFFBD9D4),
+    Color(0xFFFCE38A),
+    Color(0xFFFBFFB1),
+    Color(0xFFF08A5D),
+    Color(0xFFEA5455),
+    Color(0xFFFF2E63),
+    Color(0xFF609966),
+    Color(0xFF557153),
+    Color(0xFF00ADB5),
+    Color(0xFF3F72AF),
+    Color(0xFF950101),
+    Color(0xFF222831),
+)

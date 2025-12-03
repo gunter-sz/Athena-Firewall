@@ -173,6 +173,11 @@
     <string name="colors_dark_theme_desc">Use dark theme</string>
     <string name="colors_dynamic">Dynamic Colors</string>
     <string name="colors_dynamic_desc">Use Material You colors</string>
+    <string name="colors_accent_color">Accent Color</string>
+    <string name="colors_accent_color_desc">Choose a custom accent color for the theme</string>
+    <string name="colors_select_accent_color">Select Accent Color</string>
+    <string name="colors_use_system_colors">Use System Colors (Wallpaper)</string>
+    <string name="colors_or_choose_custom">Or choose a custom color:</string>
     <string name="colors_dynamic_icons">Dynamic Icons</string>
     <string name="colors_dynamic_icons_desc">Themed app icons</string>
     <string name="colors_amoled">AMOLED Colors</string>
