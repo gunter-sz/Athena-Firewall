@@ -287,6 +287,14 @@
     <string name="privacy_arp_spoofing">ARP Spoofing Protection</string>
     <string name="privacy_in_development">In Development</string>
     <string name="privacy_passcode">Passcode</string>
+    <string name="backup_export">Export Backup</string>
+    <string name="backup_export_desc">Backup settings, domains, and blocklists</string>
+    <string name="backup_import">Import Backup</string>
+    <string name="backup_import_desc">Restore from a previous backup</string>
+    <string name="backup_export_success">Backup exported successfully</string>
+    <string name="backup_export_failed">Backup export failed: %s</string>
+    <string name="backup_import_success">Backup imported successfully</string>
+    <string name="backup_import_failed">Backup import failed: %s</string>
     <string name="privacy_authorize_passcode">Authorize with passcode</string>
     <string name="privacy_authorize_fingerprint">Authorize with fingerprint</string>
     <string name="privacy_pattern">Pattern</string>

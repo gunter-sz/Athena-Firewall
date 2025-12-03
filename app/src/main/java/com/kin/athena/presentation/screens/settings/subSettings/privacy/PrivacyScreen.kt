@@ -17,6 +17,9 @@
 
 package com.kin.athena.presentation.screens.settings.subSettings.privacy
 
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForwardIos
 import androidx.compose.material.icons.filled.Carpenter
@@ -24,9 +27,12 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.Report
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.rounded.Backup
 import androidx.compose.material.icons.rounded.DoDisturbAlt
 import androidx.compose.material.icons.rounded.LockReset
+import androidx.compose.material.icons.rounded.RestorePage
 import androidx.compose.material3.Icon
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -47,12 +53,97 @@ import com.kin.athena.presentation.screens.settings.components.SettingsScaffold
 import com.kin.athena.presentation.screens.settings.components.settingsContainer
 import com.kin.athena.presentation.screens.settings.subSettings.lock.components.ActionType
 import com.kin.athena.presentation.screens.settings.viewModel.SettingsViewModel
+import com.kin.athena.domain.manager.BackupManager
+import com.kin.athena.di.BackupManagerEntryPoint
+import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import androidx.compose.runtime.rememberCoroutineScope
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun PrivacyScreen(
     navController: NavController,
     settings: SettingsViewModel,
 ) {
+    val context = LocalContext.current
+    val backupManager: BackupManager = EntryPointAccessors.fromApplication(
+        context.applicationContext,
+        BackupManagerEntryPoint::class.java
+    ).backupManager()
+    val scope = rememberCoroutineScope()
+
+    // Export backup launcher
+    val exportBackupLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        uri?.let {
+            scope.launch {
+                try {
+                    context.contentResolver.openOutputStream(it)?.use { outputStream ->
+                        backupManager.exportBackup(
+                            outputStream = outputStream,
+                            settings = settings.settings.value,
+                            includeSettings = true,
+                            includeDomains = true,
+                            includeBlocklists = true
+                        ).onSuccess {
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context, context.getString(R.string.backup_export_success), Toast.LENGTH_SHORT).show()
+                            }
+                        }.onFailure { error ->
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context, context.getString(R.string.backup_export_failed, error.message), Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, context.getString(R.string.backup_export_failed, e.message), Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
+    }
+
+    // Import backup launcher
+    val importBackupLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let {
+            scope.launch {
+                try {
+                    context.contentResolver.openInputStream(it)?.use { inputStream ->
+                        backupManager.importBackup(
+                            inputStream = inputStream,
+                            restoreSettings = true,
+                            restoreDomains = true,
+                            restoreBlocklists = true,
+                            onSettingsRestored = { restoredSettings ->
+                                settings.update(restoredSettings)
+                            }
+                        ).onSuccess {
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context, context.getString(R.string.backup_import_success), Toast.LENGTH_SHORT).show()
+                            }
+                        }.onFailure { error ->
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context, context.getString(R.string.backup_import_failed, error.message), Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, context.getString(R.string.backup_import_failed, e.message), Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
+    }
     SettingsScaffold(
         settings = settings,
         title = stringResource(id = R.string.settings_privacy),
@@ -106,6 +197,30 @@ fun PrivacyScreen(
                 description = stringResource(id = R.string.privacy_in_development),
                 icon = IconType.VectorIcon(Icons.Filled.Security),
                 actionType = SettingType.TEXT,
+            )
+        }
+        settingsContainer {
+            SettingsBox(
+                title = stringResource(id = R.string.backup_export),
+                description = stringResource(id = R.string.backup_export_desc),
+                icon = IconType.VectorIcon(Icons.Rounded.Backup),
+                actionType = SettingType.CUSTOM,
+                customAction = { onExit ->
+                    val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault())
+                    val fileName = "athena_backup_${dateFormat.format(Date())}.json"
+                    exportBackupLauncher.launch(fileName)
+                    onExit()
+                }
+            )
+            SettingsBox(
+                title = stringResource(id = R.string.backup_import),
+                description = stringResource(id = R.string.backup_import_desc),
+                icon = IconType.VectorIcon(Icons.Rounded.RestorePage),
+                actionType = SettingType.CUSTOM,
+                customAction = { onExit ->
+                    importBackupLauncher.launch(arrayOf("application/json"))
+                    onExit()
+                }
             )
         }
     }
