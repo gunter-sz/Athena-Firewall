@@ -68,6 +68,16 @@ jobs:
       - name: Rename APK
         run: mv app/build/outputs/apk/playstore/release/app-playstore-release-signed.apk Athena-nightly.apk
 
+      - name: Extract nightly changelog
+        run: |
+          sed -n '/## \[Nightly\]/,/## \[/p' CHANGELOG.md | sed '$ d' | tail -n +2 > nightly-changelog.txt
+          echo "" >> nightly-changelog.txt
+          echo "---" >> nightly-changelog.txt
+          echo "" >> nightly-changelog.txt
+          echo "**Build Info:**" >> nightly-changelog.txt
+          echo "- Commit: \`${{ github.sha }}\`" >> nightly-changelog.txt
+          echo "- Date: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> nightly-changelog.txt
+
       - name: Upload the APK
         uses: actions/upload-artifact@v4.6.0
         with:
@@ -80,3 +90,4 @@ jobs:
          tag: Nightly
          token: ${{ secrets.TOKEN }}
          files: Athena-nightly.apk
+         body_path: nightly-changelog.txt
