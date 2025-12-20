@@ -85,4 +85,8 @@ class ApplicationRepositoryImpl @Inject constructor(
             showSystemPackages, showOfflinePackages, searchQuery
         )
     }
+
+    override suspend fun updatePinnedStatus(packageId: String, isPinned: Boolean) {
+        provider.applicationDao().updatePinnedStatus(packageId, isPinned)
+    }
 }

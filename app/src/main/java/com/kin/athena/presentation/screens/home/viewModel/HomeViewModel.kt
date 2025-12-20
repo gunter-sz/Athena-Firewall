@@ -345,6 +345,36 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun togglePinned(packageEntity: Application) {
+        viewModelScope.launch {
+            val newPinnedStatus = !packageEntity.isPinned
+            Logger.info("HomeViewModel: togglePinned called for ${packageEntity.packageID}, newPinnedStatus=$newPinnedStatus")
+
+            // Update UI state IMMEDIATELY for instant feedback
+            val currentState = _applicationState.value
+            if (currentState is ApplicationListState.Success) {
+                val updatedApp = packageEntity.copy(isPinned = newPinnedStatus)
+                // Update the app in the list
+                val updatedApplications = currentState.applications.map { app ->
+                    if (app.packageID == packageEntity.packageID) updatedApp else app
+                }
+                // Sort: pinned apps first
+                val sortedApplications = updatedApplications.sortedWith(
+                    compareByDescending<Application> { it.isPinned }
+                        .thenBy { it.displayName.lowercase(Locale.getDefault()) }
+                )
+                _applicationState.value = currentState.copy(applications = sortedApplications)
+                Logger.info("HomeViewModel: UI state updated immediately for ${packageEntity.packageID}")
+            }
+
+            // Update database on IO thread
+            withContext(Dispatchers.IO) {
+                applicationUseCases.updatePinnedStatus.execute(packageEntity.packageID, newPinnedStatus)
+            }
+            Logger.info("HomeViewModel: Database updated for ${packageEntity.packageID}")
+        }
+    }
+
     fun addPackageByName(name: String, settingsViewModel: SettingsViewModel) {
         viewModelScope.launch {
             try {

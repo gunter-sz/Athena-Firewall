@@ -58,5 +58,8 @@ data class Application(
     val lastUpdated: Long = System.currentTimeMillis(),
 
     @ColumnInfo(name = "requires_network")
-    val requiresNetwork: Boolean = true
+    val requiresNetwork: Boolean = true,
+
+    @ColumnInfo(name = "is_pinned")
+    val isPinned: Boolean = false
 )

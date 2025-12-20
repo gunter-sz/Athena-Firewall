@@ -136,6 +136,9 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.outlined.PushPin
 import com.kin.athena.core.logging.Logger
 import com.kin.athena.presentation.screens.settings.subSettings.dns.components.MagiskSystemlessHostsDialog
 import com.kin.athena.presentation.screens.settings.subSettings.dns.root.HostsManager
@@ -593,7 +596,9 @@ private fun ProfessionalApplicationItem(
                 )
             },
             customAction = { onApplicationClicked(application.packageID) },
-            usesGMS = application.usesGooglePlayServices
+            usesGMS = application.usesGooglePlayServices,
+            onLongClick = { viewModel.togglePinned(application) },
+            isPinned = application.isPinned
         )
     }
 }
@@ -908,6 +913,7 @@ private fun getProgressStageText(progress: Float): String {
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CustomSettingsBox(
     title: String,
@@ -918,7 +924,9 @@ private fun CustomSettingsBox(
     circleWrapperSize: androidx.compose.ui.unit.Dp,
     customButton: @Composable () -> Unit,
     customAction: () -> Unit,
-    usesGMS: Boolean
+    usesGMS: Boolean,
+    onLongClick: (() -> Unit)? = null,
+    isPinned: Boolean = false
 ) {
     val context = LocalContext.current
     var showCustomAction by remember { mutableStateOf(false) }
@@ -928,9 +936,16 @@ private fun CustomSettingsBox(
             .padding(bottom = dimensionResource(id = R.dimen.card_padding_bottom))
             .clip(RoundedCornerShape(6.dp))
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .clickable {
-                customAction()
-            }
+            .then(
+                if (onLongClick != null) {
+                    Modifier.combinedClickable(
+                        onClick = { customAction() },
+                        onLongClick = onLongClick
+                    )
+                } else {
+                    Modifier.clickable { customAction() }
+                }
+            )
     ) {
         androidx.compose.foundation.layout.Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -946,30 +961,55 @@ private fun CustomSettingsBox(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
-                when (icon) {
-                    is IconType.DrawableIcon -> {
-                        CircleWrapper(
-                            size = circleWrapperSize,
-                            color = circleWrapperColor
-                        ) {
-                            Image(
-                                bitmap = icon.drawable.toBitmap().asImageBitmap(),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .height(38.dp - circleWrapperSize)
-                                    .width(38.dp - circleWrapperSize)
-                            )
+                Box {
+                    when (icon) {
+                        is IconType.DrawableIcon -> {
+                            CircleWrapper(
+                                size = circleWrapperSize,
+                                color = circleWrapperColor
+                            ) {
+                                Image(
+                                    bitmap = icon.drawable.toBitmap().asImageBitmap(),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .height(38.dp - circleWrapperSize)
+                                        .width(38.dp - circleWrapperSize)
+                                )
+                            }
+                        }
+                        is IconType.VectorIcon -> {
+                            CircleWrapper(
+                                size = 12.dp,
+                                color = circleWrapperColor
+                            ) {
+                                Icon(
+                                    imageVector = icon.imageVector,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
                         }
                     }
-                    is IconType.VectorIcon -> {
-                        CircleWrapper(
-                            size = 12.dp,
-                            color = circleWrapperColor
+
+                    // Pinned indicator - Material 3 filled pin icon at bottom right
+                    if (isPinned) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .offset(y = 4.dp) // Move down for better positioning
+                                .size(16.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.surfaceContainerLow,
+                                    shape = androidx.compose.foundation.shape.CircleShape
+                                )
+                                .padding(2.dp),
+                            contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = icon.imageVector,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
+                                imageVector = Icons.Filled.PushPin,
+                                contentDescription = "Pinned",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(12.dp)
                             )
                         }
                     }

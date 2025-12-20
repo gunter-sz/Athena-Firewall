@@ -58,17 +58,17 @@ interface ApplicationDao {
     suspend fun getExistingPackageIds(packageIds: List<String>): List<String>
 
     @Query("""
-        SELECT * FROM applications 
+        SELECT * FROM applications
         WHERE (:showSystemPackages = 1 OR system_app = 0)
         AND (:showOfflinePackages = 1 OR requires_network = 1)
         AND package_id != 'com.kin.athena'
         AND (
-            :searchQuery = '' OR 
-            display_name LIKE '%' || :searchQuery || '%' OR 
-            package_id LIKE '%' || :searchQuery || '%' OR 
+            :searchQuery = '' OR
+            display_name LIKE '%' || :searchQuery || '%' OR
+            package_id LIKE '%' || :searchQuery || '%' OR
             CAST(uid AS TEXT) LIKE '%' || :searchQuery || '%'
         )
-        ORDER BY display_name COLLATE NOCASE
+        ORDER BY is_pinned DESC, display_name COLLATE NOCASE
         LIMIT :limit OFFSET :offset
     """)
     suspend fun getFilteredApplications(
@@ -80,14 +80,14 @@ interface ApplicationDao {
     ): List<Application>
 
     @Query("""
-        SELECT COUNT(*) FROM applications 
+        SELECT COUNT(*) FROM applications
         WHERE (:showSystemPackages = 1 OR system_app = 0)
         AND (:showOfflinePackages = 1 OR requires_network = 1)
         AND package_id != 'com.kin.athena'
         AND (
-            :searchQuery = '' OR 
-            display_name LIKE '%' || :searchQuery || '%' OR 
-            package_id LIKE '%' || :searchQuery || '%' OR 
+            :searchQuery = '' OR
+            display_name LIKE '%' || :searchQuery || '%' OR
+            package_id LIKE '%' || :searchQuery || '%' OR
             CAST(uid AS TEXT) LIKE '%' || :searchQuery || '%'
         )
     """)
@@ -96,4 +96,7 @@ interface ApplicationDao {
         showOfflinePackages: Boolean,
         searchQuery: String
     ): Int
+
+    @Query("UPDATE applications SET is_pinned = :isPinned WHERE package_id = :packageId")
+    suspend fun updatePinnedStatus(packageId: String, isPinned: Boolean)
 }

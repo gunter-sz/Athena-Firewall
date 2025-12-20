@@ -12,6 +12,10 @@
     <string name="common_retry">Retry</string>
     <string name="details_title">Details</string>
     <string name="details_installation_time">Installation Time</string>
+    <string name="details_pin">Pin App</string>
+    <string name="details_unpin">Unpin App</string>
+    <string name="details_pin_desc">Pin this app to the top of the list</string>
+    <string name="details_pinned_desc">App is pinned to the top of the list</string>
     <string name="network_wifi">WiFi</string>
     <string name="network_cellular">Cellular</string>
     <string name="network_bypass_vpn">Bypass VPN</string>

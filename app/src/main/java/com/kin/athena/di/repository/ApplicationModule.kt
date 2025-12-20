@@ -32,6 +32,7 @@ import com.kin.athena.domain.usecase.application.GetExistingPackageIds
 import com.kin.athena.domain.usecase.application.GetFilteredApplications
 import com.kin.athena.domain.usecase.application.ObserveApplication
 import com.kin.athena.domain.usecase.application.UpdateApplication
+import com.kin.athena.domain.usecase.application.UpdatePinnedStatus
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -68,7 +69,8 @@ object ApplicationModule {
             updateApplication = UpdateApplication(repository),
             checkApplicationExists = CheckApplicationExists(repository),
             getExistingPackageIds = GetExistingPackageIds(repository),
-            getFilteredApplications = GetFilteredApplications(repository)
+            getFilteredApplications = GetFilteredApplications(repository),
+            updatePinnedStatus = UpdatePinnedStatus(repository)
         )
     }
 }

@@ -62,10 +62,10 @@ class DatabaseProvider(private val application: Application) {
         override fun migrate(database: SupportSQLiteDatabase) {
             // Fix any remaining empty display names (from MIGRATION_4_5)
             database.execSQL("UPDATE applications SET display_name = package_id WHERE display_name = '' OR display_name IS NULL")
-            
+
             // Add bypass_vpn column for VPN tunnel exclusion (from MIGRATION_5_6)
             database.execSQL("ALTER TABLE applications ADD COLUMN bypass_vpn INTEGER NOT NULL DEFAULT 0")
-            
+
             // Create custom_domains table for domain management (from MIGRATION_6_7 & 7_8 combined)
             database.execSQL("DROP TABLE IF EXISTS custom_domains")
             database.execSQL("""
@@ -82,6 +82,13 @@ class DatabaseProvider(private val application: Application) {
         }
     }
 
+    private val MIGRATION_8_9 = object : Migration(8, 9) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // Add is_pinned column for pinned apps feature
+            database.execSQL("ALTER TABLE applications ADD COLUMN is_pinned INTEGER NOT NULL DEFAULT 0")
+        }
+    }
+
     @Synchronized
     fun instance(): AppDatabase {
         return database ?: synchronized(this) {
@@ -93,7 +100,7 @@ class DatabaseProvider(private val application: Application) {
         return Room.databaseBuilder(application.applicationContext,
             AppDatabase::class.java,
             AppConstants.DatabaseConstants.DATABASE_NAME)
-            .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_8)
+            .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_8, MIGRATION_8_9)
             .build()
     }
 

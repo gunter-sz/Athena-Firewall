@@ -43,6 +43,8 @@ import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.Update
 import androidx.compose.material.icons.rounded.VpnLock
 import androidx.compose.material.icons.rounded.Wifi
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -194,7 +196,7 @@ private fun PackageDetails(
                 // Check protection mode
                 val isRootMode = settings.settings.value.useRootMode == true
                 val isShizukuMode = settings.settings.value.useShizukuMode == true
-                
+
                 if (isShizukuMode) {
                     // In Shizuku mode, show only one "Network" button
                     if (!packageEntity.bypassVpn) {
@@ -270,6 +272,18 @@ private fun PackageDetails(
                     }
                 }
             }
+        }
+        settingsContainer {
+            SettingsBox(
+                icon = IconType.VectorIcon(if (packageEntity.isPinned) Icons.Filled.PushPin else Icons.Outlined.PushPin),
+                title = if (packageEntity.isPinned) stringResource(id = R.string.details_unpin) else stringResource(id = R.string.details_pin),
+                description = if (packageEntity.isPinned) stringResource(id = R.string.details_pinned_desc) else stringResource(id = R.string.details_pin_desc),
+                actionType = SettingType.SWITCH,
+                variable = packageEntity.isPinned,
+                onSwitchEnabled = {
+                    homeViewModel.togglePinned(packageEntity)
+                }
+            )
         }
         packageInfo?.let {
             settingsContainer {

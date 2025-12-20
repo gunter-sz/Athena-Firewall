@@ -53,4 +53,6 @@ interface ApplicationRepository {
         showOfflinePackages: Boolean,
         searchQuery: String
     ): Int
+
+    suspend fun updatePinnedStatus(packageId: String, isPinned: Boolean)
 }

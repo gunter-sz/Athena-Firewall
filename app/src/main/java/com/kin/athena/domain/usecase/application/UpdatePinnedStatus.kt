@@ -14,18 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 package com.kin.athena.domain.usecase.application
 
-data class ApplicationUseCases(
-    val getApplications: GetApplications,
-    val deleteApplication: DeleteApplication,
-    val addApplication: AddApplication,
-    val addApplications: AddApplications,
-    val updateApplication: UpdateApplication,
-    val getApplication: GetApplication,
-    val observeApplication: ObserveApplication,
-    val checkApplicationExists: CheckApplicationExists,
-    val getExistingPackageIds: GetExistingPackageIds,
-    val getFilteredApplications: GetFilteredApplications,
-    val updatePinnedStatus: UpdatePinnedStatus
-)
+import com.kin.athena.core.utils.Result
+import com.kin.athena.core.utils.Error
+import com.kin.athena.domain.repository.ApplicationRepository
+import javax.inject.Inject
+
+class UpdatePinnedStatus @Inject constructor(
+    private val packageRepository: ApplicationRepository
+) {
+    suspend fun execute(packageId: String, isPinned: Boolean): Result<Unit, Error> {
+        return try {
+            packageRepository.updatePinnedStatus(packageId, isPinned)
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Failure(Error.ServerError(e.message ?: "Error while updating pinned status for package $packageId"))
+        }
+    }
+}
