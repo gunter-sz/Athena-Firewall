@@ -300,4 +300,17 @@
     <string name="notification_install_channel_desc">­Benachrichtigungen für App-Installationen</string>
     <string name="notification_network_speed_channel">Netzwerkgeschwindigkeitsmonitor</string>
     <string name="notification_network_speed_channel_desc">Zeigt die Netzwerkgeschwindigkeit in Echtzeit an</string>
+    <string name="colors_accent_color">Akzent Farbe</string>
+    <string name="colors_accent_color_desc">Wähle eine eigene Akzent Frabe für das Design</string>
+    <string name="colors_select_accent_color">Wähle eine Akzent Farbe</string>
+    <string name="colors_use_system_colors">Benutze Systemfarben (Hintergrundbild)</string>
+    <string name="colors_or_choose_custom">Oder wähle eine eigene Farbe:</string>
+    <string name="backup_export">Exportiere Sicherung</string>
+    <string name="backup_export_desc">Sichere Einstellungen, Domains und Sperrlisten</string>
+    <string name="backup_import">Importire Sicherung</string>
+    <string name="backup_import_desc">Stelle von einer vorherigen Sicherung wieder her</string>
+    <string name="backup_export_success">Sicherung erfolgreich exportiert</string>
+    <string name="backup_export_failed">Sicherungswiederherstellung fehlgeschlagen: %s</string>
+    <string name="backup_import_success">Sicherung erfolgreich wiederhergestellt</string>
+    <string name="backup_import_failed">Sicherungswiederherstellung fehlgeschlagen: %s</string>
 </resources>
