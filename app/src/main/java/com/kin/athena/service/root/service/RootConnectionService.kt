@@ -209,10 +209,13 @@ class RootConnectionService : Service(), CoroutineScope by CoroutineScope(Dispat
 
     private suspend fun loadRules() {
         firewallManager.update(FirewallStatus.LOADING(0f))
-        
-        val applicationsJob = async { packageManager.getApplications.execute().fold(ifSuccess = { installedApplications = it }) }
+
+        val applicationsJob = async {
+            val allDeviceApps = getAllInstalledAppsFromDevice()
+            installedApplications = allDeviceApps
+        }
         val ipsJob = async { networkFilterManager.getIps.execute().fold(ifSuccess = { ipAddresses = it.first() }) }
-        
+
         runBlocking {
             applicationsJob.await()
             ipsJob.await()
@@ -224,6 +227,57 @@ class RootConnectionService : Service(), CoroutineScope by CoroutineScope(Dispat
                 rootAppRules(apps, ips)
             }
         }
+    }
+
+    private suspend fun getAllInstalledAppsFromDevice(): List<Application> = withContext(Dispatchers.IO) {
+        // Get all apps from database
+        val dbApps = packageManager.getApplications.execute().fold(
+            ifSuccess = { it },
+            ifFailure = { emptyList() }
+        )
+
+        // Get all installed apps from device
+        val allPackages = appContext.packageManager.getInstalledApplications(0)
+
+        // Create a map of database apps by package ID for quick lookup
+        val dbAppMap = dbApps.associateBy { it.packageID }
+
+        // Merge: use database settings if available, otherwise default system apps to enabled
+        val mergedApps = allPackages.mapNotNull { packageInfo ->
+            val packageName = packageInfo.packageName
+            val uid = packageInfo.uid
+            val isSystem = (packageInfo.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+
+            // If app is in database, use its settings
+            dbAppMap[packageName] ?: run {
+                // Not in database - create default entry with system apps enabled
+                if (isSystem) {
+                    Application(
+                        packageID = packageName,
+                        uid = uid,
+                        systemApp = true,
+                        internetAccess = true,  // Default: allow wifi for system apps
+                        cellularAccess = true,  // Default: allow cellular for system apps
+                        bypassVpn = false,
+                        isPinned = false
+                    )
+                } else {
+                    // Non-system apps not in database shouldn't happen, but if they do, allow them
+                    Application(
+                        packageID = packageName,
+                        uid = uid,
+                        systemApp = false,
+                        internetAccess = true,
+                        cellularAccess = true,
+                        bypassVpn = false,
+                        isPinned = false
+                    )
+                }
+            }
+        }
+
+        Logger.info("RootConnectionService: Loaded ${mergedApps.size} total apps (${dbApps.size} from DB, ${mergedApps.size - dbApps.size} system apps not in DB)")
+        mergedApps
     }
 
     private fun onStartIntent() {
