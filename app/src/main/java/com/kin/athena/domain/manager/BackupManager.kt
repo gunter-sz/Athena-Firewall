@@ -21,6 +21,7 @@ import android.content.Context
 import com.kin.athena.core.logging.Logger
 import com.kin.athena.domain.model.*
 import com.kin.athena.domain.repository.CustomDomainRepository
+import com.kin.athena.domain.usecase.application.ApplicationUseCases
 import com.kin.athena.presentation.screens.settings.subSettings.dns.hosts.Configuration
 import com.kin.athena.presentation.screens.settings.subSettings.dns.hosts.HostState
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -36,7 +37,8 @@ import javax.inject.Singleton
 @Singleton
 class BackupManager @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val customDomainRepository: CustomDomainRepository
+    private val customDomainRepository: CustomDomainRepository,
+    private val applicationUseCases: ApplicationUseCases
 ) {
     private val json = Json {
         prettyPrint = true
@@ -48,7 +50,8 @@ class BackupManager @Inject constructor(
         settings: Settings,
         includeSettings: Boolean = true,
         includeDomains: Boolean = true,
-        includeBlocklists: Boolean = true
+        includeBlocklists: Boolean = true,
+        includeApplications: Boolean = true
     ): Result<Unit> {
         return try {
             // Collect settings
@@ -139,11 +142,32 @@ class BackupManager @Inject constructor(
                 emptyList()
             }
 
+            // Collect application rules
+            val applications = if (includeApplications) {
+                applicationUseCases.getApplications.execute().fold(
+                    ifSuccess = { apps ->
+                        apps.map {
+                            ApplicationBackup(
+                                packageID = it.packageID,
+                                internetAccess = it.internetAccess,
+                                cellularAccess = it.cellularAccess,
+                                bypassVpn = it.bypassVpn,
+                                isPinned = it.isPinned
+                            )
+                        }
+                    },
+                    ifFailure = { emptyList() }
+                )
+            } else {
+                emptyList()
+            }
+
             // Create backup data
             val backupData = BackupData(
                 settings = settingsBackup,
                 customDomains = customDomains,
-                customBlocklists = customBlocklists
+                customBlocklists = customBlocklists,
+                applications = applications
             )
 
             // Write to output stream
@@ -164,6 +188,7 @@ class BackupManager @Inject constructor(
         restoreSettings: Boolean = true,
         restoreDomains: Boolean = true,
         restoreBlocklists: Boolean = true,
+        restoreApplications: Boolean = true,
         onSettingsRestored: (Settings) -> Unit
     ): Result<BackupData> {
         return try {
@@ -232,6 +257,29 @@ class BackupManager @Inject constructor(
                     )
                 }
                 configuration.save()
+            }
+
+            // Restore application rules
+            if (restoreApplications && backupData.applications.isNotEmpty()) {
+                applicationUseCases.getApplications.execute().fold(
+                    ifSuccess = { installedApps ->
+                        // Only restore rules for apps that are currently installed
+                        backupData.applications.forEach { appBackup ->
+                            installedApps.find { it.packageID == appBackup.packageID }?.let { app ->
+                                val updatedApp = app.copy(
+                                    internetAccess = appBackup.internetAccess,
+                                    cellularAccess = appBackup.cellularAccess,
+                                    bypassVpn = appBackup.bypassVpn,
+                                    isPinned = appBackup.isPinned
+                                )
+                                applicationUseCases.updateApplication.execute(updatedApp)
+                            }
+                        }
+                    },
+                    ifFailure = { error ->
+                        Logger.error("Failed to restore application rules: ${error.message}")
+                    }
+                )
             }
 
             Logger.info("Backup imported successfully")

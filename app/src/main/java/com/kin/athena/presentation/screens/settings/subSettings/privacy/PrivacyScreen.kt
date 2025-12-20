@@ -35,6 +35,9 @@ import androidx.compose.material3.Icon
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
@@ -61,6 +64,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -77,6 +81,14 @@ fun PrivacyScreen(
     ).backupManager()
     val scope = rememberCoroutineScope()
 
+    // Dialogs state
+    var showExportDialog by remember { mutableStateOf(false) }
+    var showImportDialog by remember { mutableStateOf(false) }
+
+    // Store backup options
+    var exportOptions by remember { mutableStateOf(BackupOptions()) }
+    var importOptions by remember { mutableStateOf(BackupOptions()) }
+
     // Export backup launcher
     val exportBackupLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
@@ -88,9 +100,10 @@ fun PrivacyScreen(
                         backupManager.exportBackup(
                             outputStream = outputStream,
                             settings = settings.settings.value,
-                            includeSettings = true,
-                            includeDomains = true,
-                            includeBlocklists = true
+                            includeSettings = exportOptions.includeSettings,
+                            includeDomains = exportOptions.includeDomains,
+                            includeBlocklists = exportOptions.includeBlocklists,
+                            includeApplications = exportOptions.includeApplications
                         ).onSuccess {
                             withContext(Dispatchers.Main) {
                                 Toast.makeText(context, context.getString(R.string.backup_export_success), Toast.LENGTH_SHORT).show()
@@ -120,9 +133,10 @@ fun PrivacyScreen(
                     context.contentResolver.openInputStream(it)?.use { inputStream ->
                         backupManager.importBackup(
                             inputStream = inputStream,
-                            restoreSettings = true,
-                            restoreDomains = true,
-                            restoreBlocklists = true,
+                            restoreSettings = importOptions.includeSettings,
+                            restoreDomains = importOptions.includeDomains,
+                            restoreBlocklists = importOptions.includeBlocklists,
+                            restoreApplications = importOptions.includeApplications,
                             onSettingsRestored = { restoredSettings ->
                                 settings.update(restoredSettings)
                             }
@@ -206,9 +220,7 @@ fun PrivacyScreen(
                 icon = IconType.VectorIcon(Icons.Rounded.Backup),
                 actionType = SettingType.CUSTOM,
                 customAction = { onExit ->
-                    val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault())
-                    val fileName = "athena_backup_${dateFormat.format(Date())}.json"
-                    exportBackupLauncher.launch(fileName)
+                    showExportDialog = true
                     onExit()
                 }
             )
@@ -218,11 +230,37 @@ fun PrivacyScreen(
                 icon = IconType.VectorIcon(Icons.Rounded.RestorePage),
                 actionType = SettingType.CUSTOM,
                 customAction = { onExit ->
-                    importBackupLauncher.launch(arrayOf("application/json"))
+                    showImportDialog = true
                     onExit()
                 }
             )
         }
+    }
+
+    // Show export selection dialog
+    if (showExportDialog) {
+        BackupSelectionDialog(
+            title = stringResource(id = R.string.backup_export),
+            onDismiss = { showExportDialog = false },
+            onConfirm = { options ->
+                exportOptions = options
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault())
+                val fileName = "athena_backup_${dateFormat.format(Date())}.json"
+                exportBackupLauncher.launch(fileName)
+            }
+        )
+    }
+
+    // Show import selection dialog
+    if (showImportDialog) {
+        BackupSelectionDialog(
+            title = stringResource(id = R.string.backup_import),
+            onDismiss = { showImportDialog = false },
+            onConfirm = { options ->
+                importOptions = options
+                importBackupLauncher.launch(arrayOf("application/json"))
+            }
+        )
     }
 }
 

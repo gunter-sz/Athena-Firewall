@@ -25,7 +25,8 @@ data class BackupData(
     val timestamp: Long = System.currentTimeMillis(),
     val settings: SettingsBackup,
     val customDomains: List<CustomDomainBackup>,
-    val customBlocklists: List<CustomBlocklistBackup>
+    val customBlocklists: List<CustomBlocklistBackup>,
+    val applications: List<ApplicationBackup> = emptyList()
 )
 
 @Serializable
@@ -70,4 +71,13 @@ data class CustomBlocklistBackup(
     val title: String,
     val url: String,
     val state: String // IGNORE, DENY, ALLOW
+)
+
+@Serializable
+data class ApplicationBackup(
+    val packageID: String,
+    val internetAccess: Boolean,
+    val cellularAccess: Boolean,
+    val bypassVpn: Boolean = false,
+    val isPinned: Boolean = false
 )
