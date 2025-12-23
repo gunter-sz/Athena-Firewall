@@ -29,6 +29,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Typeface
+import androidx.core.graphics.drawable.IconCompat
 import android.net.TrafficStats
 import android.os.Build
 import android.os.Handler
@@ -183,23 +184,26 @@ class NetworkSpeedMonitorService : Service() {
 
     private fun createNotification(downloadSpeed: Float, uploadSpeed: Float): Notification {
         val graphBitmap = createFullWidthGraph(downloadSpeed, uploadSpeed)
-        
+
         val customView = RemoteViews(packageName, R.layout.notification_network_speed)
         customView.setImageViewBitmap(R.id.graph_image, graphBitmap)
-        
+
         // Update text views with speed information
         val downloadText = formatSpeedSimple(downloadSpeed.toLong())
         val uploadText = formatSpeedSimple(uploadSpeed.toLong())
-        
+
         // Create HTML text with colored arrows and grey speed text
         val downloadHtml = "<font color='#0000FF'>▼</font> <font color='#808080'>$downloadText</font>"
         val uploadHtml = "<font color='#FF0000'>▲</font> <font color='#808080'>$uploadText</font>"
-        
+
         customView.setTextViewText(R.id.download_speed, android.text.Html.fromHtml(downloadHtml))
         customView.setTextViewText(R.id.upload_speed, android.text.Html.fromHtml(uploadHtml))
 
+        // Create custom icon with speed text for status bar
+        val statusBarIcon = createStatusBarIcon(formatSpeedForStatusBar(downloadSpeed.toLong()))
+
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_shield)
+            .setSmallIcon(statusBarIcon)  // Custom icon with speed text
             .setCustomContentView(customView)
             .setCustomBigContentView(customView)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
@@ -302,5 +306,52 @@ class NetworkSpeedMonitorService : Service() {
         }
 
         canvas.drawPath(path, paint)
+    }
+
+    private fun formatSpeedForStatusBar(bytes: Long): String {
+        return when {
+            bytes < 1024 -> "${bytes}B"
+            bytes < 1024 * 1024 -> {
+                val kb = bytes / 1024.0
+                if (kb >= 10) "${kb.toInt()}K" else "%.1fK".format(Locale.US, kb).replace(".0", "")
+            }
+            bytes < 1024 * 1024 * 1024 -> {
+                val mb = bytes / (1024.0 * 1024.0)
+                if (mb >= 10) "${mb.toInt()}M" else "%.1fM".format(Locale.US, mb).replace(".0", "")
+            }
+            else -> {
+                val gb = bytes / (1024.0 * 1024.0 * 1024.0)
+                if (gb >= 10) "${gb.toInt()}G" else "%.1fG".format(Locale.US, gb).replace(".0", "")
+            }
+        }
+    }
+
+    private fun createStatusBarIcon(speedText: String): IconCompat {
+        // Create a bitmap to draw the speed text
+        val width = 128
+        val height = 128
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+
+        val paint = Paint().apply {
+            color = Color.WHITE
+            textAlign = Paint.Align.CENTER
+            isAntiAlias = true
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            // Adjust text size based on text length
+            textSize = when {
+                speedText.length <= 2 -> 80f
+                speedText.length <= 3 -> 64f
+                speedText.length <= 4 -> 52f
+                else -> 42f
+            }
+        }
+
+        // Draw text centered in bitmap
+        val xPos = width / 2f
+        val yPos = (height / 2f) - ((paint.descent() + paint.ascent()) / 2f)
+        canvas.drawText(speedText, xPos, yPos, paint)
+
+        return IconCompat.createWithBitmap(bitmap)
     }
 }
