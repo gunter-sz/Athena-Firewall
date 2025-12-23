@@ -102,9 +102,10 @@ class VpnConnectionClient : VpnService() {
         loadSettings()
         addDnsServer(NetworkConstants.VPN_DNS_ADDRESS)    // IPv4 DNS
         addAddress(settings!!.ipv4, 32)
-        addAddress(settings!!.ipv6, 128)  // Add IPv6 address
-        addRoute(NetworkConstants.ALL_TRAFFIC, 0)
-        addRoute("::", 0)  // Route all IPv6 traffic
+        // IPv6 disabled - filtering not implemented, would allow unfiltered traffic
+        // addAddress(settings!!.ipv6, 128)
+        addRoute(NetworkConstants.ALL_TRAFFIC, 0)  // Route IPv4 traffic only
+        // addRoute("::", 0)  // IPv6 routing disabled
         setMtu(NetworkConstants.MAX_PACKET_LEN)
         setBlocking(true)
         setSession(getString(R.string.app_name))

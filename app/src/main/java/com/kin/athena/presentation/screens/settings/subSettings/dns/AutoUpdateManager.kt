@@ -26,10 +26,15 @@ import com.kin.athena.presentation.screens.settings.subSettings.dns.hosts.RuleDa
 import java.util.concurrent.TimeUnit
 
 object AutoUpdateManager {
-    
-    fun initializeAutoUpdate(context: Context, intervalMs: Long) {
+
+    fun initializeAutoUpdate(context: Context, enabled: Boolean, intervalMs: Long) {
+        if (!enabled) {
+            cancelAutoUpdate(context)
+            return
+        }
+
         val workManager = WorkManager.getInstance(context)
-        
+
         // Check if auto-update worker is already scheduled
         val existingWork = workManager.getWorkInfosByTag("auto_update_blocklists")
         try {
@@ -39,19 +44,23 @@ object AutoUpdateManager {
         } catch (e: Exception) {
             // Proceed with scheduling if check fails
         }
-        
+
         scheduleAutoUpdateWorker(context, intervalMs)
     }
-    
-    fun scheduleAutoUpdateWorker(context: Context, intervalMs: Long) {
+
+    fun scheduleAutoUpdateWorker(context: Context, intervalMs: Long, enabled: Boolean = true) {
         val workManager = WorkManager.getInstance(context)
-        
+
         // Cancel existing auto-update work
         workManager.cancelAllWorkByTag("auto_update_blocklists")
-        
+
+        if (!enabled) {
+            return
+        }
+
         // Convert milliseconds to minutes (minimum interval for PeriodicWorkRequest is 15 minutes)
         val intervalMinutes = maxOf(15L, intervalMs / (60 * 1000L))
-        
+
         val autoUpdateRequest = PeriodicWorkRequestBuilder<RuleDatabaseUpdateWorker>(
             intervalMinutes, TimeUnit.MINUTES
         )
@@ -62,7 +71,12 @@ object AutoUpdateManager {
                     .build()
             )
             .build()
-        
+
         workManager.enqueue(autoUpdateRequest)
+    }
+
+    fun cancelAutoUpdate(context: Context) {
+        val workManager = WorkManager.getInstance(context)
+        workManager.cancelAllWorkByTag("auto_update_blocklists")
     }
 }

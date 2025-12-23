@@ -19,6 +19,7 @@ package com.kin.athena.service.tiles
 
 import android.graphics.drawable.Icon
 import android.net.VpnService
+import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import com.kin.athena.R
@@ -97,21 +98,27 @@ class DnsQuickSettingsTile : TileService() {
                     // VPN is running and DNS blocking is enabled
                     tile.state = Tile.STATE_ACTIVE
                     tile.label = getString(R.string.dns_blocking_title)
-                    tile.subtitle = getString(R.string.tile_status_active)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        tile.subtitle = getString(R.string.tile_status_active)
+                    }
                     tile.icon = Icon.createWithResource(applicationContext, R.drawable.ic_shield_check)
                 }
                 isVpnActive && !isDnsBlockingEnabled -> {
                     // VPN is running but DNS blocking is disabled
                     tile.state = Tile.STATE_INACTIVE
                     tile.label = getString(R.string.dns_blocking_title)
-                    tile.subtitle = getString(R.string.tile_status_tap_enable)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        tile.subtitle = getString(R.string.tile_status_tap_enable)
+                    }
                     tile.icon = Icon.createWithResource(applicationContext, R.drawable.ic_shield)
                 }
                 else -> {
                     // VPN is not running
                     tile.state = Tile.STATE_UNAVAILABLE
                     tile.label = getString(R.string.dns_blocking_title)
-                    tile.subtitle = getString(R.string.tile_status_vpn_required)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        tile.subtitle = getString(R.string.tile_status_vpn_required)
+                    }
                     tile.icon = Icon.createWithResource(applicationContext, R.drawable.ic_shield_off)
                 }
             }
@@ -124,7 +131,9 @@ class DnsQuickSettingsTile : TileService() {
             // Fallback state
             tile.state = Tile.STATE_UNAVAILABLE
             tile.label = getString(R.string.dns_blocking_title)
-            tile.subtitle = getString(R.string.tile_error)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                tile.subtitle = getString(R.string.tile_error)
+            }
             tile.icon = Icon.createWithResource(applicationContext, R.drawable.ic_shield_off)
             tile.updateTile()
         }

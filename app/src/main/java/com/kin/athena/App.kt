@@ -62,9 +62,10 @@ class App : Application(), Configuration.Provider {
     private fun initializeAutoUpdate() {
         try {
             // Use default interval of 15 minutes if settings aren't available yet
-            // The actual interval will be updated when settings are loaded
+            // The actual interval and enabled state will be updated when settings are loaded
             val defaultInterval = 15 * 60 * 1000L // 15 minutes
-            AutoUpdateManager.initializeAutoUpdate(this, defaultInterval)
+            val defaultEnabled = true // Default to enabled
+            AutoUpdateManager.initializeAutoUpdate(this, defaultEnabled, defaultInterval)
         } catch (e: Exception) {
             // Silently handle initialization errors
         }

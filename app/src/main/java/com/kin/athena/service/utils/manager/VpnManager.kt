@@ -21,6 +21,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.VpnService
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
 import com.kin.athena.R
 import com.kin.athena.service.vpn.network.util.NetworkConstants
 import com.kin.athena.presentation.components.PermissionModal
@@ -94,6 +96,8 @@ object VpnManager {
         val vpnServiceIntent = Intent(context, VpnConnectionClient::class.java).apply {
             action = NetworkConstants.ACTION_START_VPN
         }
+        // VpnConnectionClient is not a foreground service - it just launches VpnConnectionServer
+        // Use regular startService to avoid ANR "did not call startForeground()"
         context.startService(vpnServiceIntent)
     }
 
@@ -101,6 +105,7 @@ object VpnManager {
         val stopVpnServiceIntent = Intent(context, VpnConnectionClient::class.java).apply {
             action = NetworkConstants.ACTION_STOP_VPN
         }
+        // For stopping, regular startService is fine as it just sends a stop command
         context.startService(stopVpnServiceIntent)
     }
 }

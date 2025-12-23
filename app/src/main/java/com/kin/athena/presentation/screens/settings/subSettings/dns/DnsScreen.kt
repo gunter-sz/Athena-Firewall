@@ -60,6 +60,7 @@ import com.kin.athena.core.utils.constants.AppConstants
 import com.kin.athena.presentation.config
 import com.kin.athena.presentation.screens.settings.components.IconType
 import com.kin.athena.presentation.screens.settings.components.ListDialog
+import com.kin.athena.presentation.screens.settings.components.CustomListDialog
 import com.kin.athena.presentation.screens.settings.components.SettingType
 import com.kin.athena.presentation.screens.settings.components.SettingsBox
 import com.kin.athena.presentation.screens.settings.components.SettingsScaffold
@@ -118,9 +119,13 @@ fun DnsScreen(
     // Track if we're actively updating domains (different from initial load)
     var isDomainUpdateInProgress by remember { mutableStateOf(false) }
     
-    // Update auto-update interval when DNS screen loads (in case settings changed)
-    LaunchedEffect(settings.settings.value.autoUpdateInterval) {
-        AutoUpdateManager.scheduleAutoUpdateWorker(context, settings.settings.value.autoUpdateInterval)
+    // Update auto-update interval and enabled state when DNS screen loads (in case settings changed)
+    LaunchedEffect(settings.settings.value.autoUpdateInterval, settings.settings.value.autoUpdateEnabled) {
+        AutoUpdateManager.scheduleAutoUpdateWorker(
+            context,
+            settings.settings.value.autoUpdateInterval,
+            enabled = settings.settings.value.autoUpdateEnabled
+        )
     }
 
     fun updateLists(onComplete: ((Boolean) -> Unit)? = null) {
@@ -379,7 +384,7 @@ fun DnsScreen(
                     OnDNSClicked(settings, onExit)
                 }
             )
-            
+
             // Auto-update interval setting
             val autoUpdateIntervals = listOf(
                 6 * 60 * 60 * 1000L to stringResource(R.string.dns_auto_update_interval_6h),
@@ -402,9 +407,15 @@ fun DnsScreen(
                     }
             }
             
+            val autoUpdateStatus = if (settings.settings.value.autoUpdateEnabled) {
+                stringResource(R.string.dns_auto_update_desc, getCurrentIntervalText())
+            } else {
+                stringResource(R.string.dns_auto_update_enabled_desc).replaceFirstChar { "Disabled" }
+            }
+
             SettingsBox(
                 title = stringResource(R.string.dns_auto_update_title),
-                description = stringResource(R.string.dns_auto_update_desc, getCurrentIntervalText()),
+                description = autoUpdateStatus,
                 icon = IconType.VectorIcon(Icons.Rounded.Schedule),
                 actionType = SettingType.CUSTOM,
                 customAction = { onExit ->
@@ -412,34 +423,59 @@ fun DnsScreen(
                     onExit()
                 }
             )
-            
+
             if (showAutoUpdateDialog) {
-                val options = autoUpdateIntervals.map { (interval, label) ->
-                    AutoUpdateOption(interval, label)
-                }
-                
-                ListDialog(
+                CustomListDialog(
                     text = stringResource(R.string.dns_auto_update_dialog_title),
-                    list = options,
-                    onExit = { showAutoUpdateDialog = false },
-                    extractDisplayData = { it },
-                    setting = { option ->
+                    onExit = { showAutoUpdateDialog = false }
+                ) {
+                    // Enable/Disable toggle
+                    item {
                         SettingsBox(
-                            size = 8.dp,
-                            title = option.label,
-                            description = stringResource(R.string.dns_auto_update_description_template, option.label.lowercase()),
-                            actionType = SettingType.RADIOBUTTON,
-                            variable = settings.settings.value.autoUpdateInterval == option.interval,
-                            onSwitchEnabled = {
-                                if (it) {
-                                    settings.update(settings.settings.value.copy(autoUpdateInterval = option.interval))
-                                    AutoUpdateManager.scheduleAutoUpdateWorker(context, option.interval)
-                                    showAutoUpdateDialog = false
+                            title = stringResource(R.string.dns_auto_update_enabled_title),
+                            description = stringResource(R.string.dns_auto_update_enabled_desc),
+                            actionType = SettingType.SWITCH,
+                            variable = settings.settings.value.autoUpdateEnabled,
+                            onSwitchEnabled = { enabled ->
+                                settings.update(settings.settings.value.copy(autoUpdateEnabled = enabled))
+                                if (enabled) {
+                                    AutoUpdateManager.scheduleAutoUpdateWorker(
+                                        context,
+                                        settings.settings.value.autoUpdateInterval,
+                                        enabled = true
+                                    )
+                                } else {
+                                    AutoUpdateManager.cancelAutoUpdate(context)
                                 }
                             }
                         )
                     }
-                )
+
+                    // Interval options (only shown when enabled)
+                    if (settings.settings.value.autoUpdateEnabled) {
+                        autoUpdateIntervals.forEach { (interval, label) ->
+                            item {
+                                SettingsBox(
+                                    size = 8.dp,
+                                    title = label,
+                                    description = stringResource(R.string.dns_auto_update_description_template, label.lowercase()),
+                                    actionType = SettingType.RADIOBUTTON,
+                                    variable = settings.settings.value.autoUpdateInterval == interval,
+                                    onSwitchEnabled = {
+                                        if (it) {
+                                            settings.update(settings.settings.value.copy(autoUpdateInterval = interval))
+                                            AutoUpdateManager.scheduleAutoUpdateWorker(
+                                                context,
+                                                interval,
+                                                enabled = settings.settings.value.autoUpdateEnabled
+                                            )
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
         settingsContainer {

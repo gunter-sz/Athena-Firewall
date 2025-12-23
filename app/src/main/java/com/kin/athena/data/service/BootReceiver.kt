@@ -20,6 +20,10 @@ package com.kin.athena.data.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.kin.athena.core.logging.Logger
 import com.kin.athena.domain.usecase.preferences.PreferencesUseCases
 import com.kin.athena.service.utils.manager.FirewallManager
@@ -48,30 +52,48 @@ class BootReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            CoroutineScope(Dispatchers.IO).launch {
-                preferencesUseCases.loadSettings.execute().fold(
-                    ifSuccess = { settings ->
-                        if (settings.startOnBoot) {
-                            if (settings.useRootMode == true) {
-                                firewallManager.setFirewallMode(FirewallMode.ROOT)
-                                firewallManager.startFirewall()
+            // On Android 15+, use WorkManager to avoid foreground service restrictions
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                val workRequest = OneTimeWorkRequestBuilder<BootStartWorker>()
+                    .build()
 
-                            } else {
-                                if (VpnManager.permissionChecker(context)) {
+                WorkManager.getInstance(context)
+                    .enqueueUniqueWork(
+                        "boot_start_work",
+                        ExistingWorkPolicy.REPLACE,
+                        workRequest
+                    )
+
+                Logger.info("Scheduled boot services via WorkManager for Android 15+")
+            } else {
+                // On older Android versions, start services directly
+                CoroutineScope(Dispatchers.IO).launch {
+                    preferencesUseCases.loadSettings.execute().fold(
+                        ifSuccess = { settings ->
+                            if (settings.startOnBoot) {
+                                if (settings.useRootMode == true) {
+                                    firewallManager.setFirewallMode(FirewallMode.ROOT)
                                     firewallManager.startFirewall()
                                 } else {
-                                    Logger.error("Vpn permission not granted")
+                                    if (VpnManager.permissionChecker(context)) {
+                                        firewallManager.startFirewall()
+                                    } else {
+                                        Logger.error("VPN permission not granted")
+                                    }
                                 }
                             }
+
+                            // Start network speed monitor if enabled
+                            if (settings.networkSpeedMonitor) {
+                                NetworkSpeedManager.start(context)
+                                Logger.info("Network speed monitor started on boot")
+                            }
+                        },
+                        ifFailure = { error ->
+                            Logger.error("Failed to load settings on boot: ${error.message}")
                         }
-                        
-                        // Start network speed monitor if enabled
-                        if (settings.networkSpeedMonitor) {
-                            NetworkSpeedManager.start(context)
-                            Logger.info("Network speed monitor started on boot")
-                        }
-                    }
-                )
+                    )
+                }
             }
         }
     }

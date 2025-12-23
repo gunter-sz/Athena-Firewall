@@ -20,20 +20,29 @@
 #include "../athena.h"
 
 void clear(struct context *ctx) {
+    if (ctx == NULL) {
+        return;
+    }
+
     struct ng_session *s = ctx->ng_session;
     while (s != NULL) {
+        struct ng_session *next = s->next;  // Save next pointer before freeing
+
         if (s->socket >= 0) {
             if (close(s->socket) != 0) {
                 log_android(ANDROID_LOG_WARN, "Failed to close socket %d during cleanup: %s", s->socket, strerror(errno));
             }
             s->socket = -1;
         }
+
         if (s->protocol == IPPROTO_TCP)
             clear_tcp_data(&s->tcp);
-        struct ng_session *p = s;
-        s = s->next;
-        ng_free(p, __FILE__, __LINE__);
+
+        ng_free(s, __FILE__, __LINE__);
+        s = next;
     }
+
+    // Clear the session list pointer at the END to prevent handle_events race conditions
     ctx->ng_session = NULL;
 }
 
@@ -99,49 +108,56 @@ void *handle_events(void *a) {
         if (ms - last_check > EPOLL_MIN_CHECK) {
             last_check = ms;
 
-            time_t now = time(NULL);
-            struct ng_session *sl = NULL;
-            s = args->ctx->ng_session;
-            while (s != NULL) {
-                int del = 0;
-                if (s->protocol == IPPROTO_ICMP || s->protocol == IPPROTO_ICMPV6) {
-                    del = check_icmp_session(args, s, sessions, maxsessions);
-                    if (!s->icmp.stop && !del) {
-                        int stimeout = s->icmp.time + get_icmp_timeout(&s->icmp, sessions, maxsessions) - now + 1;
-                        if (stimeout > 0 && stimeout < timeout)
-                            timeout = stimeout;
+            // Lock mutex before accessing/modifying session list to prevent race with clear()
+            if (pthread_mutex_lock(&args->ctx->lock)) {
+                log_android(ANDROID_LOG_ERROR, "Failed to lock mutex for session cleanup");
+            } else {
+                time_t now = time(NULL);
+                struct ng_session *sl = NULL;
+                s = args->ctx->ng_session;
+                while (s != NULL) {
+                    int del = 0;
+                    if (s->protocol == IPPROTO_ICMP || s->protocol == IPPROTO_ICMPV6) {
+                        del = check_icmp_session(args, s, sessions, maxsessions);
+                        if (!s->icmp.stop && !del) {
+                            int stimeout = s->icmp.time + get_icmp_timeout(&s->icmp, sessions, maxsessions) - now + 1;
+                            if (stimeout > 0 && stimeout < timeout)
+                                timeout = stimeout;
+                        }
+                    } else if (s->protocol == IPPROTO_UDP) {
+                        del = check_udp_session(args, s, sessions, maxsessions);
+                        if (s->udp.state == UDP_ACTIVE && !del) {
+                            int stimeout = s->udp.time + get_udp_timeout(&s->udp, sessions, maxsessions) - now + 1;
+                            if (stimeout > 0 && stimeout < timeout)
+                                timeout = stimeout;
+                        }
+                    } else if (s->protocol == IPPROTO_TCP) {
+                        del = check_tcp_session(args, s, sessions, maxsessions);
+                        if (s->tcp.state != TCP_CLOSING && s->tcp.state != TCP_CLOSE && !del) {
+                            int stimeout = s->tcp.time + get_tcp_timeout(&s->tcp, sessions, maxsessions) - now + 1;
+                            if (stimeout > 0 && stimeout < timeout)
+                                timeout = stimeout;
+                        }
                     }
-                } else if (s->protocol == IPPROTO_UDP) {
-                    del = check_udp_session(args, s, sessions, maxsessions);
-                    if (s->udp.state == UDP_ACTIVE && !del) {
-                        int stimeout = s->udp.time + get_udp_timeout(&s->udp, sessions, maxsessions) - now + 1;
-                        if (stimeout > 0 && stimeout < timeout)
-                            timeout = stimeout;
-                    }
-                } else if (s->protocol == IPPROTO_TCP) {
-                    del = check_tcp_session(args, s, sessions, maxsessions);
-                    if (s->tcp.state != TCP_CLOSING && s->tcp.state != TCP_CLOSE && !del) {
-                        int stimeout = s->tcp.time + get_tcp_timeout(&s->tcp, sessions, maxsessions) - now + 1;
-                        if (stimeout > 0 && stimeout < timeout)
-                            timeout = stimeout;
+
+                    if (del) {
+                        if (sl == NULL)
+                            args->ctx->ng_session = s->next;
+                        else
+                            sl->next = s->next;
+
+                        struct ng_session *c = s;
+                        s = s->next;
+                        if (c->protocol == IPPROTO_TCP)
+                            clear_tcp_data(&c->tcp);
+                        ng_free(c, __FILE__, __LINE__);
+                    } else {
+                        sl = s;
+                        s = s->next;
                     }
                 }
 
-                if (del) {
-                    if (sl == NULL)
-                        args->ctx->ng_session = s->next;
-                    else
-                        sl->next = s->next;
-
-                    struct ng_session *c = s;
-                    s = s->next;
-                    if (c->protocol == IPPROTO_TCP)
-                        clear_tcp_data(&c->tcp);
-                    ng_free(c, __FILE__, __LINE__);
-                } else {
-                    sl = s;
-                    s = s->next;
-                }
+                pthread_mutex_unlock(&args->ctx->lock);
             }
         } else {
             recheck = 1;

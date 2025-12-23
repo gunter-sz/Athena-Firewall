@@ -107,8 +107,12 @@
 
         <service
             android:name=".service.utils.notifications.NetworkSpeedMonitorService"
-            android:foregroundServiceType="dataSync"
-            android:exported="false" />
+            android:foregroundServiceType="specialUse"
+            android:exported="false">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Network speed monitoring" />
+        </service>
 
         <receiver
             android:name=".data.service.BootReceiver"

@@ -84,17 +84,24 @@ write(ctx->pipefds[1], "w", 1);
 
 JNIEXPORT void JNICALL Java_com_kin_athena_service_vpn_service_TunnelManager_jni_1done(JNIEnv *env, jobject instance, jlong context) {
     if (context == 0) return;
-    
+
     struct context *ctx = (struct context *) context;
     if (ctx == NULL) return;
-    
-    clear(ctx);
-    
+
+    // Lock before clearing to prevent race with handle_events
+    if (pthread_mutex_lock(&ctx->lock) == 0) {
+        clear(ctx);
+        pthread_mutex_unlock(&ctx->lock);
+    } else {
+        // If lock fails, still try to clear (last resort cleanup)
+        clear(ctx);
+    }
+
     // Only destroy mutex if it was initialized
     if (pthread_mutex_destroy(&ctx->lock) != 0) {
         // Mutex was already destroyed or not initialized, continue cleanup
     }
-    
+
     if (ctx->pipefds[0] >= 0) close(ctx->pipefds[0]);
     if (ctx->pipefds[1] >= 0) close(ctx->pipefds[1]);
     ng_free(ctx, __FILE__, __LINE__);

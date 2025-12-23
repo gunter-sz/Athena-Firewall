@@ -513,12 +513,19 @@ class HomeViewModel @Inject constructor(
         override fun onAppUninstalled(packageName: String?) {
             packageName?.let {
                 viewModelScope.launch {
-                    val application = applicationUseCases.getApplication.execute(it)
-                    application.fold(
-                        ifSuccess = { applicationModel ->
-                            applicationUseCases.deleteApplication.execute(applicationModel)
-                        }
-                    )
+                    try {
+                        val application = applicationUseCases.getApplication.execute(it)
+                        application.fold(
+                            ifSuccess = { applicationModel ->
+                                applicationUseCases.deleteApplication.execute(applicationModel)
+                            },
+                            ifFailure = { error ->
+                                Logger.error("Failed to get application $it for uninstall cleanup: ${error.message}")
+                            }
+                        )
+                    } catch (e: Exception) {
+                        Logger.error("Error handling app uninstall for $it: ${e.message}")
+                    }
                 }
             }
         }

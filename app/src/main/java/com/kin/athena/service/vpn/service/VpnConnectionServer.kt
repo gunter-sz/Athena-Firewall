@@ -315,8 +315,23 @@ class VpnConnectionServer : Service(), CoroutineScope by MainScope(), AppChangeC
 
     override fun onDestroy() {
         super.onDestroy()
+
+        // Immediately stop foreground to prevent timeout exception
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            stopForeground(true)
+        }
+
+        // Do cleanup in background to avoid blocking main thread
         if (!isStoppedBySelf) {
-            stopVpn()
+            Thread {
+                try {
+                    stopVpn()
+                } catch (e: Exception) {
+                    Logger.error("Error during service cleanup: ${e.message}", e)
+                }
+            }.start()
         }
     }
 
@@ -333,11 +348,7 @@ class VpnConnectionServer : Service(), CoroutineScope by MainScope(), AppChangeC
                     Logger.error("Error closing resources: ${e.localizedMessage}", e)
                 }
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    stopForeground(STOP_FOREGROUND_REMOVE)
-                } else {
-                    stopForeground(true)
-                }
+                // stopForeground is now called in onDestroy() to prevent timeout
                 Logger.info("Vpn server is stopped")
                 isStoppedBySelf = true
                 stopSelf()

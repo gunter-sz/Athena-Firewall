@@ -81,6 +81,7 @@ data class Settings(
     val malwareProtection: Boolean = false,
     val adBlocker: Boolean = false,
     val trackerProtection: Boolean = false,
+    val autoUpdateEnabled: Boolean = true,
     val autoUpdateInterval: Long = 24 * 60 * 60 * 1000L,
     val premiumUnlocked: Boolean = false,
 

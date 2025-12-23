@@ -202,6 +202,8 @@
     <string name="dns_social_media_desc">Block social media sites</string>
     <string name="dns_block_adult">Block adult content</string>
     <string name="dns_block_gambling">Block gambling sites</string>
+    <string name="dns_auto_update_enabled_title">Enable Auto-update</string>
+    <string name="dns_auto_update_enabled_desc">Automatically update filter lists</string>
     <string name="dns_auto_update_title">Auto-update Lists</string>
     <string name="dns_auto_update_desc">Current interval: %1$s</string>
     <string name="dns_auto_update_dialog_title">Auto-update Interval</string>
