@@ -147,6 +147,14 @@ class SettingsViewModel @Inject constructor(
             return
         }
 
+        // Check if this specific product is already owned
+        val isOwned = billingProvider.getBillingInterface()?.isProductOwned(productId) ?: false
+        if (isOwned) {
+            Logger.info("Product $productId already owned, executing onSuccess without showing dialog")
+            onSuccess()
+            return
+        }
+
         println("DEBUG: SettingsViewModel(${this.hashCode()}) - Setting dialog state to true")
         _currentFeatureChoice.value = FeatureChoice(
             featureName = featureName,
@@ -303,5 +311,9 @@ class SettingsViewModel @Inject constructor(
 
     suspend fun validatePremiumStatus(): Boolean {
         return settings.value.premiumUnlocked
+    }
+
+    fun isProductOwned(productId: String): Boolean {
+        return billingProvider.getBillingInterface()?.isProductOwned(productId) ?: false
     }
 }

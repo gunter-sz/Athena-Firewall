@@ -23,4 +23,5 @@ interface BillingInterface {
     fun getProductPrice(productId: String): String?
     fun getAllProductPrices(): Map<String, String>
     fun checkExistingPurchases(onPremiumOwned: () -> Unit)
+    fun isProductOwned(productId: String): Boolean
 }

@@ -31,6 +31,7 @@ class PlayStoreBillingManager @Inject constructor(
     private lateinit var billingClient: BillingClient
     private val productDetailsMap = mutableMapOf<String, ProductDetails>()
     private var pendingSuccessCallback: (() -> Unit)? = null
+    private val ownedProducts = mutableSetOf<String>()
 
     init {
         setupBillingClient()
@@ -121,14 +122,21 @@ class PlayStoreBillingManager @Inject constructor(
             QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build()
         ) { billingResult, purchases ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
-                val hasPremium = purchases.any {
-                    it.products.contains("all_features") && it.purchaseState == Purchase.PurchaseState.PURCHASED
+                // Clear and rebuild owned products cache
+                ownedProducts.clear()
+                purchases.forEach { purchase ->
+                    if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+                        ownedProducts.addAll(purchase.products)
+                        Logger.info("Owned product: ${purchase.products}")
+                    }
                 }
+
+                val hasPremium = ownedProducts.contains("all_features")
                 if (hasPremium) {
                     Logger.info("User already owns premium features")
                     onPremiumOwned()
                 } else {
-                    Logger.info("User does not own premium features")
+                    Logger.info("User owns individual features: $ownedProducts")
                 }
             } else {
                 Logger.error("Error checking existing purchases: ${billingResult.responseCode}")
@@ -221,6 +229,10 @@ class PlayStoreBillingManager @Inject constructor(
     private fun handlePurchase(purchase: Purchase) {
         if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
             Logger.info("Purchase: ${purchase.products}")
+            // Add to owned products cache
+            ownedProducts.addAll(purchase.products)
+            Logger.info("Updated owned products cache: $ownedProducts")
+
             if (!purchase.isAcknowledged) {
                 billingClient.acknowledgePurchase(
                     AcknowledgePurchaseParams.newBuilder()
@@ -253,5 +265,11 @@ class PlayStoreBillingManager @Inject constructor(
         }.toMap()
         Logger.info("All product prices: $prices")
         return prices
+    }
+
+    override fun isProductOwned(productId: String): Boolean {
+        val isOwned = ownedProducts.contains(productId) || ownedProducts.contains("all_features")
+        Logger.info("Checking if $productId is owned: $isOwned (owned products: $ownedProducts)")
+        return isOwned
     }
 }

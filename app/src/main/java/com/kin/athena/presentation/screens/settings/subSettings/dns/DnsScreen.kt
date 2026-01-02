@@ -596,7 +596,8 @@ fun DnsScreen(
                 actionType = SettingType.CUSTOM,
                 customAction = { onExit ->
                     println("DEBUG: Custom action composable called")
-                    if (!settings.settings.value.premiumUnlocked) {
+                    val isOwned = settings.isProductOwned("custom_blocklist")
+                    if (!settings.settings.value.premiumUnlocked && !isOwned) {
                         showPremiumDialog = true
                     } else {
                         navController.navigate(SettingRoutes.CustomBlocklist.route)

@@ -91,4 +91,10 @@ class FDroidBillingManager @Inject constructor(
         // F-Droid doesn't use Google Play billing, so no purchases to check
         Logger.info("F-Droid: No purchase check needed")
     }
+
+    override fun isProductOwned(productId: String): Boolean {
+        // F-Droid doesn't track individual purchases
+        Logger.info("F-Droid: No product ownership tracking")
+        return false
+    }
 }

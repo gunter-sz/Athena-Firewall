@@ -24,7 +24,7 @@ android {
             useSupportLibrary = true
         }
         androidResources {
-            localeFilters += listOf("en","de")
+            localeFilters += listOf("en","ca","de","es","fr","pl")
         }
         externalNativeBuild {
             cmake {
