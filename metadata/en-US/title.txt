@@ -1,1 +1,1 @@
-Athena: Firewall & Adblocker
+Athena: Firewall DNS AdBlocker

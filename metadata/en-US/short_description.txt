@@ -1,1 +1,1 @@
-Firewall & AdBlocker (Root/VPN Supported). Material3 And Minimalistic Design
+Block ads & trackers with DNS filtering. Root, Shizuku, VPN. No-root firewall.

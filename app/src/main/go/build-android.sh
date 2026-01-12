@@ -3,7 +3,7 @@
 set -e
 
 NDK_VERSION="27.0.12077973"
-ANDROID_HOME="${ANDROID_HOME:-$HOME/Android/Sdk}"
+ANDROID_HOME="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
 NDK="$ANDROID_HOME/ndk/$NDK_VERSION"
 
 if [ ! -d "$NDK" ]; then

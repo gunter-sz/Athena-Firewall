@@ -116,7 +116,7 @@ Feel free to reach out through any of the following channels:
 ## ⚠️ License
     Athena
 
-    Copyright (c)2025 Vexzure
+    Copyright (c)2025-2026-2026 Vexzure
     
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

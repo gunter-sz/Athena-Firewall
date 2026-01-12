@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Vexzure
+ * Copyright (C) 2025-2026 Vexzure
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,6 +79,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.material.icons.rounded.Numbers
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.Gavel
+import androidx.compose.material.icons.rounded.Camera
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
@@ -180,6 +181,12 @@ fun AboutScreen(
                 icon = IconType.VectorIcon(Icons.AutoMirrored.Rounded.ContactSupport),
                 actionType = SettingType.LINK,
                 onLinkClicked = { uriHandler.openUri(ProjectConstants.SUPPORT_DISCORD) },
+            )
+            SettingsBox(
+                title = stringResource(id = R.string.about_instagram),
+                icon = IconType.VectorIcon(Icons.Rounded.Camera),
+                actionType = SettingType.LINK,
+                onLinkClicked = { uriHandler.openUri(ProjectConstants.SUPPORT_INSTAGRAM) },
             )
             SettingsBox(
                 title = stringResource(id = R.string.about_feature),

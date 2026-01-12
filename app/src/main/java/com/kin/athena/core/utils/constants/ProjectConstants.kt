@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Vexzure
+ * Copyright (C) 2025-2026 Vexzure
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ object ProjectConstants {
     const val LICENSE_URL = "https://www.gnu.org/licenses/gpl-3.0.en.html"
     const val SUPPORT_MAIL = "support@easyapps.me"
     const val SUPPORT_DISCORD = "https://discord.gg/ZrP4G8z23H"
+    const val SUPPORT_INSTAGRAM = "https://www.instagram.com/easyapps.me/"
     const val GITHUB_FEATURE_REQUEST = "https://github.com/Kin69/Athena/issues"
     
     // Store URLs - update these with your actual package name

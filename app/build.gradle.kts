@@ -17,8 +17,8 @@ android {
         applicationId = "com.kin.athena"
         minSdk = 24
         targetSdk = 36
-        versionCode = 205
-        versionName = "1.5"
+        versionCode = 306
+        versionName = "1.80"
 
         vectorDrawables {
             useSupportLibrary = true
