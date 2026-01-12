@@ -32,6 +32,7 @@
     <string name="about_source_code">Código fuente</string>
     <string name="about_email">Correo electrónico</string>
     <string name="about_discord">Descartar</string>
+    <string name="about_instagram">Instagram - Soporte más rápido</string>
     <string name="about_rate_app">Califica la app</string>
     <string name="about_your_name">Vexzure99</string>
     <string name="root_permission_description">Otorgar acceso \"root\" para administrar el tráfico de red usando \"iptables\". Esto permite a la aplicación controlar qué aplicaciones pueden acceder a internet</string>

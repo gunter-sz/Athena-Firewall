@@ -41,9 +41,10 @@
     <string name="about_source_code">Code Source</string>
     <string name="about_email">Courriel</string>
     <string name="about_discord">Discord</string>
-    <string name="about_rate_app">Noter l’app</string>
+    <string name="about_instagram">Instagram - Support le plus rapide</string>
+    <string name="about_rate_app">Noter l\'app</string>
     <string name="about_your_name">Vexzure99</string>
-    <string name="root_permission_description">Accorder l’accès root pour gérer le trafic réseau avec iptables. Cela permet à l’app de contrôler quelles applications peuvent accéder à Internet</string>
+    <string name="root_permission_description">Accorder l\'accès root pour gérer le trafic réseau avec iptables. Cela permet à l\'app de contrôler quelles applications peuvent accéder à Internet</string>
     <string name="language_description">Changer de langage</string>
     <string name="logs_search_packets">Filtrage (app, IP, domaines)</string>
     <string name="notification_install_message">A été installé</string>

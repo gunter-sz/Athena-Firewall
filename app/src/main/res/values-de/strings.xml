@@ -36,6 +36,7 @@
     <string name="about_source_code">Quellcode</string>
     <string name="about_email">E-Mail</string>
     <string name="about_discord">Discord</string>
+    <string name="about_instagram">Instagram - Schnellster Support</string>
     <string name="about_rate_app">App bewerten</string>
     <string name="about_your_name">Vexzure99</string>
     <string name="root_permission_description">Gewähre Root-Zugriff, um den Netzwerkverkehr mit iptables zu verwalten. Dadurch kann die App steuern, welche Apps auf das Internet zugreifen können</string>

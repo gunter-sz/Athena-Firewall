@@ -40,6 +40,7 @@
     <string name="about_source_code">Source Code</string>
     <string name="about_email">Email</string>
     <string name="about_discord">Discord</string>
+    <string name="about_instagram">Instagram - Fastest Support</string>
     <string name="about_rate_app">Rate App</string>
     <string name="about_your_name">Vexzure99</string>
     <string name="root_permission_description">Grant root access to manage network traffic using iptables. This allows the app to control which apps can access the internet</string>

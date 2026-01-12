@@ -36,6 +36,7 @@
     <string name="about_source_code">源代码</string>
     <string name="about_email">邮箱</string>
     <string name="about_discord">Discord</string>
+    <string name="about_instagram">Instagram - 最快速的支持</string>
     <string name="about_rate_app">应用评分</string>
     <string name="about_your_name">Vexzure99</string>
     <string name="root_permission_description">授予root权限以使用iptables管理网络流量。这允许应用程序控制哪些应用程序可以访问互联网</string>
