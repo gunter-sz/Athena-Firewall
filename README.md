@@ -16,7 +16,7 @@
 
   <!-- Download Buttons -->
   <div>
-    <a href="https://github.com/Kin69/Athena/releases/download/1.0/Athena.apk" target="_blank">
+    <a href="https://github.com/Kin69/Athena/releases/download/1.8/Athena.apk" target="_blank">
       <picture>
         <source media="(max-width: 600px)" srcset="https://i.ibb.co/0pDZ3ZhL/github-download.png" width="30%">
         <img src="https://i.ibb.co/0pDZ3ZhL/github-download.png" width="160" alt="GitHub Download">
